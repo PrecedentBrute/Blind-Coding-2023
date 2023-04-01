@@ -78,7 +78,6 @@ def question(request):
 def runCode(request):
 	postData = json.loads(request.body.decode('utf-8'))
 	print(postData)
-	url = 'https://api.jdoodle.com/execute'
 
 	email = postData["email"]
 	
@@ -96,7 +95,8 @@ def runCode(request):
 	}
 	
 	postData['stdin'] = stdin
-	
+	url = 'https://judge0-ce.p.rapidapi.com/submissions',
+
 	response = requests.post(url , json=req)	
 	resp = response.json()
 
@@ -173,6 +173,48 @@ def runCode(request):
 	else:
 		res['completedGame'] = 'false'
 
+	return HttpResponse(json.dumps(res))
+
+def executeCode(request):
+	postData = json.loads(request.body.decode('utf-8'))
+	print(postData)
+
+	email = postData["email"]
+	que = Question.objects.get(qno=postData['qNo'])
+
+	stdin = '3' + '\n' + que.test_case1 + '\n' + que.test_case2 + '\n' + que.test_case3
+
+	url = "https://judge0-ce.p.rapidapi.com/submissions"
+
+	querystring = {"base64_encoded":"true","fields":"*"}
+	payload = {
+		"language_id": postData["language_id"],
+		"source_code": postData["source_code"],
+		"stdin": ""
+	}
+	headers = {
+		"content-type": "application/json",
+		"Content-Type": "application/json",
+		"X-RapidAPI-Key": "9aba23fd27msh4f6a0d16b420c2bp11e1cfjsn5bcece972b58",
+		"X-RapidAPI-Host": "judge0-ce.p.rapidapi.com"
+	}
+
+	response = requests.request("POST", url, json=payload, headers=headers, params=querystring)
+	print(response.text)
+
+	url = "https://judge0-ce.p.rapidapi.com/submissions/" + response.json()["token"]
+
+	querystring = {"base64_encoded":"true","fields":"*"}
+
+	headers = {
+		"X-RapidAPI-Key": "9aba23fd27msh4f6a0d16b420c2bp11e1cfjsn5bcece972b58",
+		"X-RapidAPI-Host": "judge0-ce.p.rapidapi.com"
+	}
+
+	response = requests.request("GET", url, headers=headers, params=querystring)
+
+	print(response.text)
+	res = response.json()
 	return HttpResponse(json.dumps(res))
 
 def l_out(request):
