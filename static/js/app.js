@@ -245,7 +245,8 @@ function runCode() {
         response = JSON.parse(response);
         setOutput(atob(response["stdout"]));
         if(response["stderr"] != "")
-          setOutput(atob(response["stderr"]));  
+          //setOutput(atob(response["stderr"]));
+          setOutput("Your code failed to run on one or multiple test cases. Please try again.")  
         setScore(response["score"]);
         setRunAttempts(response["runAttempts"]);
 
